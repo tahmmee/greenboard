@@ -111,6 +111,7 @@
           </div>
         </div>
 
+        <!--
         <div class="row">
           <div class="col-sm-12">
            <div class="btn-group">
@@ -130,22 +131,30 @@
           </div>
          </div>
         </div>
+        -->
       </div>
 
       <div class="row"  ng-controller="TimelineCtrl">
 
         <div class="col-sm-12" id="timeline" class="section">
-            <bar-chart data="timelineAbsData"></bar-chart>
-            <input type="range"></input>
+            <div class="row">
+                <bar-chart></bar-chart>
+            </div>
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-6">
+                    <!--<div id="slider"></div>-->
+                    <!--<input class="slider" type="range" width="20" ng-model="xShift"></input>-->
+                </div>
+            </div>
         </div>
 
         <div class="col-sm-12" id="timeline" class="section">
-            <!--<pie-chart></pie-chart>
             <pie-chart></pie-chart>
-            <pie-chart></pie-chart>-->
+            <pie-chart></pie-chart>
+            <pie-chart></pie-chart>
         </div>
       </div>
-
+        
       <div class="row" ng-controller="JobsCtrl">
         <div class="col-sm-12">
           <!-- Nav tabs -->
