@@ -1,10 +1,149 @@
+function objAsList (obj){
+        var li = []; 
+        for (var key in obj) {
+            li.push(obj[key]);
+        }
+        return li;       
+}
+
+function buildModuleDirective(){
+
+    function link(scope, element, attr){
+
+        var colors = ["#3bc93b", "#de0000", "#ddd"];
+        var svgwidth = 860;
+        var svgheight = 860;
+        var width = 100;
+        var height = 100;
+        var categories;
+        var platforms;
+        var updateCategories = function(){
+
+            var data = {
+              categories: platforms.map(function(d){ return d.Platform; }),
+              platforms:
+ [
+                
+                {
+                  label: '2012',
+                  values: [4, 8, 15, 16, 23, 42]
+                },
+                {
+                  label: '2013',
+                  values: [12, 43, 22, 11, 73, 25]
+                },
+                {
+                  label: '2014',
+                  values: [31, 28, 14, 8, 15, 21]
+                },]
+            };
+            /*
+            var colors = ["#3bc93b", "#de0000", "#ddd"];
+            var min = Math.min(width, height);
+            var pie = d3.layout.pie()
+                .sort(null);
+            var arc = d3.svg.arc()
+                .outerRadius(min / 2 * 0.9)
+                .innerRadius(min / 2 * 0.5);
+
+            var svg = d3.select(element[0]).append('svg')
+                        .attr({width: svgwidth, height: svgheight});
+
+            var xoffset = 0,
+                yoffset = 0;
+
+            var g = svg.selectAll('pie')
+                .data(categories)
+              .enter()
+                .append('g')
+                .attr("class", "pie")
+                .attr('transform', function(d, i){
+                    if((i % 8)==0){
+                        xoffset = 0;
+                        yoffset += height;
+                    }
+                    xoffset = xoffset + width;
+                  return 'translate(' + xoffset + ',' + yoffset + ')';
+                });
+
+             g.selectAll('path')
+                 .data(function(d){return pie([d.Passed, d.Failed, 23]); })
+                 .enter().append('path')
+                 .style('stroke', 'white')
+                 .attr('d', arc)
+                 .attr('fill', function(d, i){ return colors[i]});
+            */
+        }
+
+        scope.$watch('build', function(data){
+            if((data != undefined) && data.Version){
+                console.log(data);
+            }
+        }, true);
+        scope.$watch('platforms', function(data){
+            if((data != undefined) && 
+                     (Object.keys(data).length > 0)){
+                platforms = objAsList(data);
+            }
+        }, true);
+        scope.$watch('categories', function(data){
+            if((data != undefined) && 
+                     (Object.keys(data).length > 0)){
+               d3.select(element[0]).select("svg").remove();
+               categories = objAsList(data);
+               updateCategories(); 
+            }
+        }, true);
+    }
+    return {
+        link: link,
+        restrict: 'E',
+        scope: { build : "=",
+                 platforms: "=",
+                 categories: "=" }
+    }
+}
+
+function pieChartDirective(){
+
+    function link(scope, element, attr){
+        var colors = ["#3bc93b", "#de0000", "#ddd"];
+        var data = [scope.data.Passed, scope.data.Failed];
+        var width = 150;
+        var height = 150;
+        var min = Math.min(width, height);
+        var svg = d3.select(element[0]).append('svg');
+        var pie = d3.layout.pie();
+        var arc = d3.svg.arc()
+            .outerRadius(min / 2 * 0.9)
+            .innerRadius(min / 2 * 0.5);
+
+        svg.attr({width: width, height: height});
+        var g = svg.append('g')
+            .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+        g.selectAll('path').data(pie(data))
+            .enter().append('path')
+            .style('stroke', 'white')
+            .attr('d', arc)
+            .attr('fill', function(d, i){ return colors[i]});
+    }
+
+    return {
+        link: link,
+        restrict: 'E',
+        scope: { data : "=" }
+    }
+}
+
+
 function barChartDirective(Data, $location){
 
-    var margin = {top: 70, right: 10, bottom: 100, left: 50},
-         margin2 = {top: 10, right: 10, bottom: 20, left: 50},
-        width = 860 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom,
-        height2 = 130 - margin2.top - margin2.bottom;
+     var margin = {top: 10, right: 10, bottom: 150, left: 50},
+         margin2 = {top: 180, right: 10, bottom: 20, left: 50},
+         width = 860 - margin.left - margin.right,
+         height = 300 - margin.top - margin.bottom,
+         height2 = 300 - margin2.top - margin2.bottom;
 
     var selectedIndex = 0;
 
@@ -72,15 +211,15 @@ function barChartDirective(Data, $location){
                 .attr("width", width)
                 .attr("height", width);
 
-            var context = svg.append("g")
-                .attr("class", "context")
-                .attr("transform",
-                    "translate(" + margin2.left + "," + margin2.top + ")");
-
             var focus = svg.append("g")
                 .attr("class", "focus")
                 .attr("transform",
                      "translate("+ margin.left +"," + margin.top + ")");
+
+            var context = svg.append("g")
+                .attr("class", "context")
+                .attr("transform",
+                    "translate(" + margin2.left + "," + margin2.top + ")");
 
 
             var xTickerValues = function(pass){
@@ -205,7 +344,7 @@ function barChartDirective(Data, $location){
 
             var cxlayer = context.append("g")
               .attr("class", "x axis")
-              .attr("transform", "translate(0," + margin2.top+ ")")
+              .attr("transform", "translate(0," + height2 + ")")
               .call(xAxis2);
 
             cxlayer.append("g")
@@ -213,8 +352,8 @@ function barChartDirective(Data, $location){
               .call(brush)
               .call(brush.event)
             .selectAll("rect")
-              .attr("y", -50)
-              .attr("height", height2-2);
+              .attr("y", -1*(height2+10))
+              .attr("height", 50);
 
 
             rect.on("click", function(event, i) {
@@ -265,37 +404,3 @@ function barChartDirective(Data, $location){
         scope: false
     }
 }
-
-function pieChartDirective(){
-
-    function link(scope, element, attr){
-        var color = d3.scale.category10();
-        var data = [10, 20, 30];
-        var width = 150;
-        var height = 150;
-        var min = Math.min(width, height);
-        var svg = d3.select(element[0]).append('svg');
-        var pie = d3.layout.pie().sort(null);
-        var arc = d3.svg.arc()
-            .outerRadius(min / 2 * 0.9)
-            .innerRadius(min / 2 * 0.5);
-
-        svg.attr({width: width, height: height});
-        var g = svg.append('g')
-            .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
-
-        g.selectAll('path').data(pie(data))
-            .enter().append('path')
-            .style('stroke', 'white')
-            .attr('d', arc)
-            .attr('fill', function(d, i){ return color(i) });
-    }
-
-    return {
-        link: link,
-        restrict: 'E',
-        scope: false,
-    }
-}
-
-

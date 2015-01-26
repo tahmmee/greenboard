@@ -17,10 +17,60 @@
     </div>
   </div>
   <div class="container-fluid">
-    <div class="col-sm-3 col-md-2 sidebar"  ng-controller="SidebarCtrl">
+
+    <div class="col-sm-9 col-md-10  main">
+
+      <div  ng-controller="InitDataCtrl">
+        <div class="row">
+          <div class="col-sm-12">
+           <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+              {{targetBy.title}} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu" role="menu">
+              <li ng-click="didSelectTarget(target)" ng-repeat="target in viewTargets">
+                <a href="">{{target.title}}</a>
+              </li>
+            </ul>
+            <ul class="pagination">
+              <li id={{v}} ng-repeat="v in pagerVersions" ng-class="{'active': v == selectedVersion}" class="pagecell">
+                 <a ng-click="didSelectVersion(v)" href="">{{ v }}</a>
+               </li>
+            </ul>
+           </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row"  ng-controller="TimelineCtrl">
+
+        <div class="col-sm-12" id="timeline" class="section">
+            <div class="row">
+                <bar-chart></bar-chart>
+            </div>
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-6"></div>
+            </div>
+        </div>
+
+        <div class="col-sm-12" id="timeline" class="section">
+
+        </div>
+      </div>
+
+    <!-- side bar -->
+    <div class="row" ng-controller="SidebarCtrl">
+        <hr/>
+        <form class="buildmodule">
+          <label ng-repeat="os in objAsList(Platforms) | orderBy:orderByPerc">
+            <input type="radio" name="mode" value="grouped"> {{os.Platform}}</input>
+          </label>
+        </form>
+        <build-module build="build" platforms="Platforms" categories="Categories"></build-module>
+        <!--
       <div class="nav nav-sidebar">
         <div class="nav-header">
-          <h3>Build</h3>
+          <h3>Build: {{build.Version}}</h3>
           <span class="custom-list-group-item {{build.Status}}">
             <p>{{build.Version}}
                <span ng-click="didClickSlider()">
@@ -82,81 +132,16 @@
                 <span ng-if="!showAsPerc" class="testscore">{{category.Passed}}/{{category.Failed + category.Passed}}</span>
               </span>
              </a>
+              <pie-chart data="category"></pie-chart>
             </span>
           </div>
         </form>
-       </div>
-    </div>
+       </div>-->
+    </div><!-- eo side bar -->
+    </div> <!-- end content scope -->
 
-    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-
-      <div  ng-controller="InitDataCtrl">
-        <div class="row">
-          <div class="col-sm-12">
-           <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-              {{targetBy.title}} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu" role="menu">
-              <li ng-click="didSelectTarget(target)" ng-repeat="target in viewTargets">
-                <a href="">{{target.title}}</a>
-              </li>
-            </ul>
-            <ul class="pagination">
-              <li id={{v}} ng-repeat="v in pagerVersions" ng-class="{'active': v == selectedVersion}" class="pagecell">
-                 <a ng-click="didSelectVersion(v)" href="">{{ v }}</a>
-               </li>
-            </ul>
-           </div>
-          </div>
-        </div>
-
-        <!--
-        <div class="row">
-          <div class="col-sm-12">
-           <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-              {{filterBy.title}} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu" role="menu">
-              <li ng-click="didSelectMenu(menu)" ng-repeat="menu in filterMenues">
-                <a href="">{{menu.title}}</a>
-              </li>
-            </ul>
-            <ul class="pagination subpager">
-              <li ng-class="{'active': f == filterBy.value}" ng-repeat="f in filterBy.options">
-                <a ng-click="didSelectFilter(f)" href="">{{f}}</a>
-              </li>
-            </ul>
-          </div>
-         </div>
-        </div>
-        -->
-      </div>
-
-      <div class="row"  ng-controller="TimelineCtrl">
-
-        <div class="col-sm-12" id="timeline" class="section">
-            <div class="row">
-                <bar-chart></bar-chart>
-            </div>
-            <div class="row">
-                <div class="col-sm-offset-3 col-sm-6">
-                    <!--<div id="slider"></div>-->
-                    <!--<input class="slider" type="range" width="20" ng-model="xShift"></input>-->
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-12" id="timeline" class="section">
-            <pie-chart></pie-chart>
-            <pie-chart></pie-chart>
-            <pie-chart></pie-chart>
-        </div>
-      </div>
-        
-      <div class="row" ng-controller="JobsCtrl">
-        <div class="col-sm-12">
+        <div class="col-sm-3 col-md-2" ng-controller="JobsCtrl">
+    <div class="row" ng-controller="SidebarCtrl">
           <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist" id="jobTabs">
               <li class="active"><a href="#executed" role="tab" data-toggle="tab"><h4>{{jobsCompleted}} Jobs Completed</h4></a></li>
@@ -206,8 +191,8 @@
         </div>
       </div>
 
-    </div> <-- eo-contentd-iv -->
-  </div> <-- eo-container-div -->
+    </div> <!-- eo-contentd-iv -->
+  </div> <!-- eo-container-div -->
 
   <script>
    $(function () {
