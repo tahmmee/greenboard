@@ -27,11 +27,15 @@ var JobsCtrl = function ($scope, ViewService, Data, $location){
       var build = Data.selectedBuildObj.Version;
       $scope.jobs = [];
       $scope.missingJobs = [];
+      $scope.failedJobs = [];
+      $scope.unstableJobs = [];
       var dupeChecker = {};
       $scope.testsPassed = 0;
       $scope.testsTotal = 0;
+      $scope.failedJobsCount = 0;
+      $scope.unstableJobsCount = 0;
 
-      var pushToJobScope = function(response, ctx, isMissingScope){
+      var pushToJobScope = function(response, ctx, isMissingScope, failedCtx, unstableCtx){
             response.forEach(function(job){
                 if (job.Bid == -1){
                   job.Bid = "";
@@ -55,9 +59,41 @@ var JobsCtrl = function ($scope, ViewService, Data, $location){
                    "priority": job.Priority,
                    "url": job.Url,
                    "bid": job.Bid,
-                   "duration": msToTime(job.Duration)
+                   "duration": msToTime(job.Duration),
+                   "claim": job.Claim
                 });
-                if(isMissingScope){
+                if (failedCtx != null) {
+                  if (job.Result == "FAILURE") {
+                    failedCtx.push({
+                      "name": job.Name,
+                      "passed": job.Passed,
+                      "total": job.Total,
+                      "result": job.Result,
+                      "priority": job.Priority,
+                      "url": job.Url,
+                      "bid": job.Bid,
+                      "duration": msToTime(job.Duration),
+                      "claim": job.Claim
+                    });
+                  }
+                }
+               if (unstableCtx != null) {
+                  if (job.Result == "UNSTABLE") {
+                    unstableCtx.push({
+                      "name": job.Name,
+                      "passed": job.Passed,
+                      "total": job.Total,
+                      "result": job.Result,
+                      "priority": job.Priority,
+                      "url": job.Url,
+                      "bid": job.Bid,
+                      "duration": msToTime(job.Duration),
+                      "claim": job.Claim
+                    });
+                  }
+                }
+
+              if(isMissingScope){
                     $scope.testsPending += job.Total;
                 } else {
                     $scope.testsPassed += job.Passed;
@@ -77,12 +113,14 @@ var JobsCtrl = function ($scope, ViewService, Data, $location){
       }
 
       ViewService.jobs(build, platforms, categories).then(function(response){
-        pushToJobScope(response, $scope.jobs, false);
+        pushToJobScope(response, $scope.jobs, false, $scope.failedJobs, $scope.unstableJobs);
         $scope.jobsCompleted = $scope.jobs.length;
+        $scope.failedJobsCount = $scope.failedJobs.length;
+        $scope.unstableJobsCount = $scope.unstableJobs.length;
 
           ViewService.jobs_missing(build, platforms, categories).then(function(response){
             $scope.testsPending = 0;
-            pushToJobScope(response, $scope.missingJobs, true);
+            pushToJobScope(response, $scope.missingJobs, true, null, null);
             $scope.jobsPending = $scope.missingJobs.length;
             $scope.runningJobs = false;
           });
